@@ -1,14 +1,6 @@
 from pathlib import Path
+from threading import Lock
 
-from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-from langchain_community.document_loaders import (
-    PyPDFLoader,
-    TextLoader,
-    Docx2txtLoader
-)
 
 from app.config import (
     CHROMA_PATH,
@@ -24,6 +16,8 @@ class RAGService:
     logger = get_logger(__name__)
 
     def __init__(self):
+        from langchain_chroma import Chroma
+        from langchain_huggingface import HuggingFaceEmbeddings
 
         self.embeddings = HuggingFaceEmbeddings(
             model_name=EMBEDDING_MODEL
@@ -44,6 +38,12 @@ class RAGService:
         )
 
     def load_document(self, file_path: str):
+
+        from langchain_community.document_loaders import (
+                    PyPDFLoader,
+                    TextLoader,
+                    Docx2txtLoader
+                )
 
         path = Path(file_path)
         extension = path.suffix.lower()
@@ -93,6 +93,7 @@ class RAGService:
         return documents
 
     def load_documents(self, documents_path="documents"):
+       
 
         documents = []
 
@@ -122,6 +123,9 @@ class RAGService:
 
     def create_vectorstore(self, documents_path="documents"):
 
+        from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+
         documents = self.load_documents(
             documents_path
         )
@@ -148,6 +152,9 @@ class RAGService:
         return len(chunks)
 
     def add_document(self, file_path: str):
+
+        from langchain_text_splitters import RecursiveCharacterTextSplitter
+
 
         path = Path(file_path)
 
@@ -235,3 +242,18 @@ class RAGService:
             )
 
             raise
+
+
+_rag_service = None
+_rag_service_lock = Lock()
+
+
+def get_rag_service():
+    global _rag_service
+
+    if _rag_service is None:
+        with _rag_service_lock:
+            if _rag_service is None:
+                _rag_service = RAGService()
+
+    return _rag_service

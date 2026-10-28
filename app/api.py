@@ -22,7 +22,7 @@ from app.logging_config import get_logger
 from app.services.customer_service import CustomerService
 from app.services.ticket_service import TicketService
 from app.services.customer_import_service import CustomerImportService
-from app.services.rag_service import RAGService
+from app.services.rag_service import get_rag_service
 from app.services.analytics_service import AnalyticsService
 
 from app.auth_api import router as auth_router
@@ -677,9 +677,6 @@ def get_customer_ticket_summary(current_user: User = Depends(
 # RAG FILE UPLOAD
 # =====================================================
 
-rag_service = RAGService()
-
-
 @app.post("/knowledge/upload")
 def upload_knowledge_file(
     file: UploadFile = File(...),
@@ -729,7 +726,7 @@ def upload_knowledge_file(
                 buffer
             )
 
-        result = rag_service.add_document(
+        result = get_rag_service().add_document(
             str(file_path)
         )
 
