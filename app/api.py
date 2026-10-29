@@ -680,8 +680,8 @@ def get_customer_ticket_summary(current_user: User = Depends(
 @app.post("/knowledge/upload")
 def upload_knowledge_file(
     file: UploadFile = File(...),
-   current_user: User = Depends(
-    require_role("Admin", "Support Agent")
+    current_user: User = Depends(
+        require_role("Admin", "Support Agent")
 )
 ):
 
