@@ -4,17 +4,14 @@ from getpass import getpass
 from sqlalchemy.exc import IntegrityError
 
 from app.auth import hash_password
-from app.database import Base, engine, SessionLocal
-from app.models import Customer, Ticket, User
+from app.database import SessionLocal
+from app.models import User
+
 
 ALLOWED_ROLES = ["Admin", "Support Agent", "Viewer"]
 
 
 def create_user():
-
-     # Create any missing CRM tables
-    Base.metadata.create_all(bind=engine)
-
     db = SessionLocal()
 
     try:

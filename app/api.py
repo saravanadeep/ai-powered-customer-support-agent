@@ -683,8 +683,8 @@ rag_service = RAGService()
 @app.post("/knowledge/upload")
 def upload_knowledge_file(
     file: UploadFile = File(...),
-    current_user: User = Depends(
-        require_role("Admin", "Support Agent")
+   current_user: User = Depends(
+    require_role("Admin", "Support Agent")
 )
 ):
 
