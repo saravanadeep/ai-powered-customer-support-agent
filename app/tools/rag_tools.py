@@ -1,8 +1,9 @@
 from langchain_core.tools import tool
 
-from app.services.rag_service import get_rag_service
+from app.services.rag_service import RAGService
 
 
+rag_service = RAGService()
 
 
 @tool
@@ -18,7 +19,7 @@ def search_knowledge_base(query: str) -> str:
     - internal documentation
     """
 
-    documents = get_rag_service().search(query)
+    documents = rag_service.search(query)
 
     if not documents:
         return "No relevant information found in the knowledge base."
