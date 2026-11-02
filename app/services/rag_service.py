@@ -26,7 +26,10 @@ class RAGService:
     def __init__(self):
 
         self.embeddings = HuggingFaceEmbeddings(
-            model_name=EMBEDDING_MODEL
+            model_name=EMBEDDING_MODEL,
+            model_kwargs={
+                "device": "cpu"
+            }
         )
 
         self.vectorstore = Chroma(
@@ -83,7 +86,7 @@ class RAGService:
                 "Only PDF, TXT and DOCX files are supported."
             )
 
-        documents = loader.load()
+        documents = list(loader.lazy_load())
 
         self.logger.info(
             f"Document loaded successfully. "
