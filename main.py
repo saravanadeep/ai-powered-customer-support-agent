@@ -1,5 +1,4 @@
 from app.agent import agent
-from fastapi import FastAPI
 from app.api import app as api_app
 
 app = api_app
