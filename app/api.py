@@ -24,6 +24,7 @@ from app.services.ticket_service import TicketService
 from app.services.customer_import_service import CustomerImportService
 from app.tools.rag_tools import get_rag_service
 from app.services.analytics_service import AnalyticsService
+from app.services.storage_service import upload_knowledge_document
 
 from app.auth_api import router as auth_router
 from fastapi import Depends
@@ -682,57 +683,58 @@ def get_customer_ticket_summary(current_user: User = Depends(
 @app.post("/knowledge/upload")
 def upload_knowledge_file(
     file: UploadFile = File(...),
-   current_user: User = Depends(
-    require_role("Admin", "Support Agent")
-)
+    current_user: User = Depends(
+        require_role("Admin", "Support Agent")
+    )
 ):
-
     allowed_extensions = {
         ".pdf",
         ".txt",
         ".docx"
     }
 
-    file_extension = Path(
-        file.filename
-    ).suffix.lower()
+    safe_filename = Path(file.filename or "upload").name
+    file_extension = Path(safe_filename).suffix.lower()
 
     if file_extension not in allowed_extensions:
-
         raise HTTPException(
             status_code=400,
-            detail=(
-                "Unsupported file type. "
-                "Only PDF, TXT and DOCX files are supported."
-            )
+            detail="Only PDF, TXT and DOCX files are supported."
         )
 
-    upload_dir = Path(
-        "documents/uploads/knowledge"
-    )
+    # Create a temporary local directory for ChromaDB processing
+    upload_dir = Path("uploads/temp_knowledge")
+    upload_dir.mkdir(parents=True, exist_ok=True)
 
-    upload_dir.mkdir(
-        parents=True,
-        exist_ok=True
-    )
+    # Use a unique filename to avoid collisions
+    import uuid
+    unique_filename = f"{uuid.uuid4().hex}_{safe_filename}"
+    file_path = upload_dir / unique_filename
 
-    safe_filename = Path(file.filename or "upload").name
-    file_path = upload_dir / safe_filename
+    object_key = f"documents/{unique_filename}"
 
     try:
-
+        # Save temporarily for ChromaDB processing
         with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
 
-            shutil.copyfileobj(
-                file.file,
-                buffer
-            )
+        # Step 1: Upload original document to Neon
+        storage_result = upload_knowledge_document(
+            str(file_path),
+            object_key
+        )
 
-        result = get_rag_service().add_document(
+        # Step 2: Index document in existing ChromaDB
+        rag_result = get_rag_service().add_document(
             str(file_path)
         )
 
-        return result
+        return {
+            "success": True,
+            "message": "Document uploaded to Neon and indexed in ChromaDB.",
+            "storage": storage_result,
+            "rag": rag_result
+        }
 
     except Exception:
         logger.exception("Knowledge base upload API request failed.")
@@ -743,5 +745,8 @@ def upload_knowledge_file(
         )
 
     finally:
-
         file.file.close()
+
+        # Remove temporary local file
+        if file_path.exists():
+            file_path.unlink()

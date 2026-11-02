@@ -39,6 +39,62 @@ def get_storage_client():
         ),
     )
 
+def upload_knowledge_document(file_path: str, object_key: str):
+    client = get_storage_client()
+
+    path = Path(file_path)
+
+    if not path.exists():
+        raise FileNotFoundError(path)
+
+    # Calculate SHA-256 checksum
+    sha256 = hashlib.sha256()
+
+    with path.open("rb") as file:
+        for block in iter(lambda: file.read(1024 * 1024), b""):
+            sha256.update(block)
+
+    checksum = sha256.hexdigest()
+
+    # Determine content type
+    content_types = {
+        ".pdf": "application/pdf",
+        ".txt": "text/plain",
+        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    }
+
+    content_type = content_types.get(
+        path.suffix.lower(),
+        "application/octet-stream"
+    )
+
+    # Upload original document to Neon
+    client.upload_file(
+        str(path),
+        "knowledge-base",
+        object_key,
+        ExtraArgs={
+            "ContentType": content_type,
+            "Metadata": {
+                "sha256": checksum
+            }
+        }
+    )
+
+    # Verify upload
+    response = client.head_object(
+        Bucket="knowledge-base",
+        Key=object_key
+    )
+
+    return {
+        "success": True,
+        "object_key": object_key,
+        "filename": path.name,
+        "size": response["ContentLength"],
+        "checksum": checksum
+    }
+
 
 def test_storage_connection():
     client = get_storage_client()
