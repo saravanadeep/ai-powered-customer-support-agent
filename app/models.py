@@ -7,11 +7,13 @@ from sqlalchemy import (
     Text,
     DateTime,
     ForeignKey,
-    Boolean
+    Boolean,
+    UniqueConstraint,
+    Index
 )
 
+from pgvector.sqlalchemy import Vector
 from app.database import Base
-
 
 class Customer(Base):
 
@@ -137,6 +139,92 @@ class User(Base):
         default=datetime.utcnow
     )
 
+class KnowledgeDocument(Base):
+
+    __tablename__ = "knowledge_documents"
+
+    document_id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    filename = Column(
+        String(255),
+        nullable=False
+    )
+
+    storage_key = Column(
+        String(500),
+        nullable=False,
+        unique=True
+    )
+
+    file_type = Column(
+        String(20),
+        nullable=False
+    )
+
+    checksum = Column(
+        String(64),
+        nullable=False,
+        index=True
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False
+    )
+
+
+class KnowledgeChunk(Base):
+
+    __tablename__ = "knowledge_chunks"
+
+    chunk_id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    # Original ChromaDB record ID
+    chroma_id = Column(
+        String(36),
+        nullable=False,
+        unique=True
+    )
+
+    document_id = Column(
+        Integer,
+        ForeignKey(
+            "knowledge_documents.document_id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    chunk_text = Column(
+        Text,
+        nullable=False
+    )
+
+    source_metadata = Column(
+        Text,
+        nullable=True
+    )
+
+    embedding = Column(
+        Vector(384),
+        nullable=False
+    )
+
+    __table_args__ = (
+        Index(
+            "ix_knowledge_chunks_document_id",
+            "document_id"
+        ),
+    )
 
 
 
