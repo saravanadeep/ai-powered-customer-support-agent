@@ -44,3 +44,8 @@ test_recovered_index.py
 test_remote_tfidf_retrieval.py
 test_updated_rag_service.py
 test_strict_remote_startup.py
+# Local development tools and environments
+.agents/
+.claude/
+.venv/
+venv/
