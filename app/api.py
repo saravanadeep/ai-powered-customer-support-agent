@@ -680,6 +680,7 @@ def get_customer_ticket_summary(current_user: User = Depends(
 
 
 
+
 @app.post("/knowledge/upload")
 def upload_knowledge_file(
     file: UploadFile = File(...),
@@ -687,61 +688,84 @@ def upload_knowledge_file(
         require_role("Admin", "Support Agent")
     )
 ):
-    allowed_extensions = {
-        ".pdf",
-        ".txt",
-        ".docx"
-    }
+    allowed_extensions = {".pdf", ".txt", ".docx"}
 
     safe_filename = Path(file.filename or "upload").name
     file_extension = Path(safe_filename).suffix.lower()
 
     if file_extension not in allowed_extensions:
+        file.file.close()
         raise HTTPException(
             status_code=400,
             detail="Only PDF, TXT and DOCX files are supported."
         )
 
-    # Create a temporary local directory for ChromaDB processing
+    # Create temporary directory
     upload_dir = Path("uploads/temp_knowledge")
     upload_dir.mkdir(parents=True, exist_ok=True)
 
-    # Use a unique filename to avoid collisions
+    # Generate unique filename
     import uuid
+
     unique_filename = f"{uuid.uuid4().hex}_{safe_filename}"
     file_path = upload_dir / unique_filename
 
     object_key = f"documents/{unique_filename}"
 
     try:
-        # Save temporarily for ChromaDB processing
+        # Step 1: Save document temporarily
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        # Step 1: Upload original document to Neon
+        # Step 2: Upload original document to object storage
         storage_result = upload_knowledge_document(
             str(file_path),
             object_key
         )
 
-        # Step 2: Index document in existing ChromaDB
+        # Step 3: Index using the selected RAG backend
+        # ChromaDB or TF-IDF is selected through RAG_BACKEND
         rag_result = get_rag_service().add_document(
             str(file_path)
         )
 
+        # Step 4: Verify indexing result
+        if not rag_result.get("success"):
+            logger.error(
+                "Document stored but RAG indexing failed: %s",
+                rag_result
+            )
+
+            raise HTTPException(
+                status_code=500,
+                detail=(
+                    "Document was uploaded to object storage, "
+                    "but knowledge base indexing failed."
+                )
+            )
+
         return {
             "success": True,
-            "message": "Document uploaded to Neon and indexed in ChromaDB.",
+            "message": (
+                "Document uploaded to object storage "
+                "and indexed successfully."
+            ),
             "storage": storage_result,
             "rag": rag_result
         }
+
+    except HTTPException:
+        raise
 
     except Exception:
         logger.exception("Knowledge base upload API request failed.")
 
         raise HTTPException(
             status_code=500,
-            detail="Knowledge base upload failed. Please check the file and try again."
+            detail=(
+                "Knowledge base upload failed. "
+                "Please check the file and try again."
+            )
         )
 
     finally:

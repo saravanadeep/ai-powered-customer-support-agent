@@ -26,3 +26,4 @@ pwdlib[argon2]
 PyJWT
 pgvector
 boto3
+scikit-learn

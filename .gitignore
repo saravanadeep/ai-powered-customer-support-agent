@@ -1,18 +1,46 @@
-.agents/
-.claude/
-.ipynb_checkpoints/
-documents/
-.env
-.env.*
-!.env.example
+# Temporary Python and macOS files
+.DS_Store
+app/.DS_Store
+
+# Local recovery and test data
+recovery_documents/
+
+# Python
 __pycache__/
-.venv/
-venv/
-*.pyc
-*.log
-chroma_db/
-uploads/
+*.py[cod]
 .pytest_cache/
 .coverage
 htmlcov/
-.DS_Store
+.ipynb_checkpoints/
+
+# Environment
+.env
+.env.*
+
+# Local databases and indexes
+chroma_db/
+chroma_db_backup_*/
+tfidf_index/
+tfidf_recovery/
+tfidf_recovery_clean/
+tfidf_remote_test/
+
+# Runtime files
+logs/
+uploads/
+documents/
+test_documents/
+
+# Temporary backups
+app/services/rag_tf_service_backup.py
+
+# Temporary recovery scripts
+recover_tfidf_index.py
+build_clean_tfidf_index.py
+upload_clean_tfidf_index.py
+verify_remote_tfidf_index.py
+test_clean_tfidf_index.py
+test_recovered_index.py
+test_remote_tfidf_retrieval.py
+test_updated_rag_service.py
+test_strict_remote_startup.py
