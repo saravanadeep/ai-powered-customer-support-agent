@@ -139,7 +139,7 @@ class TicketService:
 
                 tickets = (
                     db.query(Ticket)
-                    .order_by(Ticket.created_at.desc())
+                    .order_by(Ticket.created_at.asc())
                     .all()
                 )
 
