@@ -1,4 +1,4 @@
-# AI-Powered Customer Support & CRM Agent
+<h1 align="center">AI-Powered Customer Support & CRM Platform</h1>
 
 <p align="center">
   <strong>An Agentic AI customer support and CRM platform built with FastAPI, Streamlit, PostgreSQL, LangChain, and Retrieval-Augmented Generation.</strong>
