@@ -14,7 +14,7 @@ The application uses a distributed deployment architecture, with the Streamlit f
 
 **GitHub Repository:** https://github.com/saravanadeep/ai-powered-customer-support-agent
 
-**Deployment Branch:** `feature/hybrid-rag`
+**Deployment Branch:** `main`
 
 ---
 
@@ -143,7 +143,7 @@ API_URL = "https://ai-powered-customer-support-agent.onrender.com"
 ### Clone Repository
 
 ```bash
-git clone -b feature/hybrid-rag \
+git clone -b main \
 https://github.com/saravanadeep/ai-powered-customer-support-agent.git
 ```
 
@@ -420,7 +420,7 @@ https://github.com/saravanadeep/ai-powered-customer-support-agent
 **Branch:**
 
 ```text
-feature/hybrid-rag
+main
 ```
 
 ### Push Local Changes
@@ -428,7 +428,7 @@ feature/hybrid-rag
 ```bash
 git add .
 git commit -m "Describe your changes"
-git push origin feature/hybrid-rag
+git push origin main
 ```
 
 ### Deploy Latest Frontend Code to EC2
