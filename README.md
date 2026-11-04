@@ -194,7 +194,7 @@ ai-powered-customer-support-agent/
 ### 1. Clone the repository
 
 ```bash
-git clone -b feature/hybrid-rag \
+git clone -b main \
 https://github.com/saravanadeep/ai-powered-customer-support-agent.git
 
 cd ai-powered-customer-support-agent
