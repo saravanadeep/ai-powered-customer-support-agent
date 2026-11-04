@@ -1,4 +1,4 @@
-#        AI-Powered Customer Support & CRM Platform
+<h1 align="center">AI-Powered Customer Support & CRM Platform</h1>
 
 <p align="center">
   <strong>An intelligent customer support platform powered by Generative AI, Agentic AI, and configurable retrieval-augmented generation.</strong>
