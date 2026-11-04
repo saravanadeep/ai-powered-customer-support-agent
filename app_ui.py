@@ -92,8 +92,7 @@ st.markdown(
 
         border-radius: 20px !important;
 
-        width: 100% !important;
-        box-sizing: border-box !important;
+        width: 120% !important;
 
         transition: all 0.3s ease-in-out;
 
