@@ -49,3 +49,10 @@ test_strict_remote_startup.py
 .claude/
 .venv/
 venv/
+
+# Credentials and private keys
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
