@@ -1,7 +1,7 @@
 #        AI-Powered Customer Support & CRM Platform
 
 <p align="center">
-  <strong>An intelligent customer support platform powered by Generative AI, Hybrid RAG, and Agentic AI.</strong>
+  <strong>An intelligent customer support platform powered by Generative AI, Agentic AI, and configurable retrieval-augmented generation.</strong>
 </p>
 
 <p align="center">
@@ -46,10 +46,13 @@ It enables users to manage customers and support tickets, interact with an AI su
 - LLM-powered responses using Groq.
 - Context-aware assistance through knowledge retrieval.
 
-### 4. Hybrid Retrieval-Augmented Generation
-- Retrieve relevant information from knowledge documents.
-- Combine retrieval capabilities with LLM-based response generation.
-- Support document-based question answering.
+### 4. Configurable Retrieval-Augmented Generation (RAG)
+- Semantic retrieval using ChromaDB with Hugging Face embeddings.
+- Keyword-based retrieval using TF-IDF and scikit-learn.
+- Select one retrieval backend through the `RAG_BACKEND` configuration (`chroma` or `tfidf`).
+- Provide retrieved document context to the AI agent for document-based question answering.
+
+**Note:** The current implementation selects one RAG backend at a time; it does not fuse ChromaDB and TF-IDF results into a single hybrid result set.
 
 ### 5. Document Management
 - Upload knowledge documents through the application.
@@ -110,9 +113,10 @@ The application follows a distributed frontend-backend architecture.
 | Database | Neon PostgreSQL | Relational data storage |
 | LLM | Groq | AI-powered responses |
 | AI Framework | LangChain | LLM and retrieval integration |
-| RAG | Hybrid RAG | Knowledge retrieval |
-| Embeddings | Hugging Face | Document embeddings |
-| Vector Storage | ChromaDB / configured retrieval storage | Knowledge retrieval |
+| RAG | Configurable ChromaDB or TF-IDF backend | Knowledge retrieval |
+| Embeddings | Hugging Face sentence-transformers (Chroma backend) | Semantic document embeddings |
+| Keyword Retrieval | scikit-learn TF-IDF | Keyword-based document retrieval |
+| Index Persistence | ChromaDB persistence / Joblib TF-IDF index | Store the selected retrieval index |
 | Object Storage | S3-compatible storage | Document storage |
 | Web Server | Nginx | Reverse proxy |
 | Frontend Hosting | AWS EC2 | Streamlit hosting |
@@ -137,7 +141,7 @@ The application follows a distributed frontend-backend architecture.
 - Generative AI
 - Large Language Models
 - Retrieval-Augmented Generation
-- Hybrid RAG
+- Configurable RAG (ChromaDB or TF-IDF)
 - Agentic AI
 - LangChain
 - Groq
@@ -147,6 +151,7 @@ The application follows a distributed frontend-backend architecture.
 - PostgreSQL
 - Neon
 - ChromaDB
+- scikit-learn TF-IDF
 - S3-compatible Object Storage
 
 **Cloud and Deployment**
