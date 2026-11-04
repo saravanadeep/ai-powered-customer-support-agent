@@ -29,6 +29,22 @@ It enables users to manage customers and support tickets, interact with an AI su
 | Swagger API Docs | https://ai-powered-customer-support-agent.onrender.com/docs |
 | GitHub Repository | https://github.com/saravanadeep/ai-powered-customer-support-agent |
 
+
+## Demo Login Credentials
+
+Use the following accounts to explore the application's role-based access.
+
+| Role | Username | Password |
+|---|---|---|
+| Admin | `admin` | `123456789` |
+| Support Agent | `support agent` | `123456789` |
+| Viewer | `viewer` | `123456789` |
+
+**Demo Application:** https://smart-support-ai.duckdns.org
+
+**Note:** These are placeholder credentials. Create the demo accounts before publishing their actual login details.
+
+
 ## Key Features
 
 ### 1. Customer Relationship Management
