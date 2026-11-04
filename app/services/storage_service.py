@@ -161,6 +161,74 @@ def upload_test_document(file_path: str):
     return object_key
 
 
+def upload_index_file(file_path: str, object_key: str):
+    """Upload the TF-IDF index to object storage."""
+
+    client = get_storage_client()
+    path = Path(file_path)
+
+    if not path.exists():
+        raise FileNotFoundError(path)
+
+    client.upload_file(
+        str(path),
+        "knowledge-base",
+        object_key,
+        ExtraArgs={
+            "ContentType": "application/octet-stream"
+        }
+    )
+
+    # Verify upload
+    response = client.head_object(
+        Bucket="knowledge-base",
+        Key=object_key
+    )
+
+    return {
+        "success": True,
+        "object_key": object_key,
+        "size": response["ContentLength"]
+    }
+
+
+def download_index_file(object_key: str, destination_path: str):
+    """Download the TF-IDF index from object storage."""
+
+    client = get_storage_client()
+    path = Path(destination_path)
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        client.download_file(
+            "knowledge-base",
+            object_key,
+            str(path)
+        )
+
+        return {
+            "success": True,
+            "object_key": object_key,
+            "local_path": str(path)
+        }
+
+    except Exception as exc:
+        from botocore.exceptions import ClientError
+
+        if (
+            isinstance(exc, ClientError)
+            and exc.response.get("Error", {}).get("Code") == "404"
+        ):
+            return {
+                "success": False,
+                "message": "Index does not exist in object storage."
+            }
+
+        raise
+
+
+
 
 if __name__ == "__main__":
     test_storage_connection()

@@ -132,6 +132,7 @@ class CustomerService:
                         (Customer.email.ilike(f"%{query}%")) |
                         (Customer.company.ilike(f"%{query}%"))
                     )
+                    .order_by(Customer.customer_id.asc())
                     .all()
                 )
 

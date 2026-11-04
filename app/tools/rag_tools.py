@@ -3,23 +3,18 @@ from threading import Lock
 
 from langchain_core.tools import tool
 
+from app.config import RAG_BACKEND
+
 
 # ==========================================
-# LAZY RAG INITIALIZATION
+# RAG SERVICE INITIALIZATION
 # ==========================================
 
 _rag_service = None
-
 _rag_service_lock = Lock()
 
 
 def get_rag_service():
-    """
-    Initialize RAGService only when required.
-
-    The lock prevents multiple threads from
-    initializing separate RAG instances.
-    """
 
     global _rag_service
 
@@ -29,9 +24,23 @@ def get_rag_service():
 
             if _rag_service is None:
 
-                from app.services.rag_service import RAGService
+                if RAG_BACKEND == "chroma":
 
-                _rag_service = RAGService()
+                    from app.services.rag_service import RAGService
+
+                    _rag_service = RAGService()
+
+                elif RAG_BACKEND == "tfidf":
+
+                    from app.services.rag_tf_service import RAGTFService
+
+                    _rag_service = RAGTFService()
+
+                else:
+
+                    raise ValueError(
+                        f"Unsupported RAG_BACKEND: {RAG_BACKEND}"
+                    )
 
     return _rag_service
 

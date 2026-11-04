@@ -1,200 +1,332 @@
 <h1 align="center">AI-Powered Customer Support & CRM Platform</h1>
 
 <p align="center">
-  <strong>An Agentic AI customer support and CRM platform built with FastAPI, Streamlit, PostgreSQL, LangChain, and Retrieval-Augmented Generation.</strong>
+  <strong>An intelligent customer support platform powered by Generative AI, Agentic AI, and configurable retrieval-augmented generation.</strong>
 </p>
 
 <p align="center">
-  <a href="https://ai-powered-customer-support-agent.onrender.com/docs">API Documentation (Swagger UI)</a> •
-  <a href="https://github.com/saravanadeep/ai-powered-customer-support-agent">GitHub Repository</a>
+  <a href="https://smart-support-ai.duckdns.org">Live Application</a> •
+  <a href="https://ai-powered-customer-support-agent.onrender.com/docs">API Documentation</a> •
+  <a href="DEPLOYMENT.md">Deployment Guide</a>
 </p>
 
 ---
 
 ## Overview
 
-The **AI-Powered Customer Support & CRM Agent** is a customer relationship management application that combines customer and ticket operations with an AI agent. The agent can select from available tools to work with CRM records, support tickets, internal knowledge, analytics, and external web information.
+The **AI-Powered Customer Support & CRM Platform** is an intelligent customer relationship management system designed to streamline customer interactions, ticket management, and AI-powered support operations.
 
-The application uses a Streamlit frontend and a FastAPI backend. Its agent is built with LangChain and a Groq-hosted language model.
+The platform combines a Streamlit frontend, FastAPI backend, PostgreSQL database, Retrieval-Augmented Generation (RAG), and Agentic AI to provide an integrated customer support experience.
+
+It enables users to manage customers and support tickets, interact with an AI support assistant, and retrieve relevant information from uploaded knowledge documents.
+
+## Live Deployment
+
+| Component | URL |
+|---|---|
+| Live Application | https://smart-support-ai.duckdns.org |
+| FastAPI Backend | https://ai-powered-customer-support-agent.onrender.com |
+| Swagger API Docs | https://ai-powered-customer-support-agent.onrender.com/docs |
+| GitHub Repository | https://github.com/saravanadeep/ai-powered-customer-support-agent |
 
 ## Key Features
 
 ### 1. Customer Relationship Management
-- Create, search, retrieve, update, and delete customer records.
-- Use CRM tools to access customer information.
+- Create and manage customer records.
+- Search and retrieve customer information.
+- Organize customer information through the CRM interface.
 
 ### 2. Ticket Management
-- Create, retrieve, and update customer support tickets.
-- Access ticket information through agent tools.
+- Create and manage customer support tickets.
+- Retrieve and track ticket information.
+- Integrate ticket operations with customer records.
 
-### 3. Agentic AI Support
-- Tool-using agent built with LangChain.
-- Uses the configured Groq language model.
-- Chooses relevant tools based on the user's request.
-- Handles CRM, ticket, knowledge-base, analytics, and web-search tasks.
+### 3. AI-Powered Customer Support
+- Interactive AI support assistant.
+- LLM-powered responses using Groq.
+- Context-aware assistance through knowledge retrieval.
 
-### 4. Knowledge Base and RAG
-- Search internal support information and uploaded documents.
-- Uses a knowledge-base search tool exposed to the agent.
-- Supports retrieval-augmented answers grounded in retrieved content.
+### 4. Configurable Retrieval-Augmented Generation (RAG)
+- Semantic retrieval using ChromaDB with Hugging Face embeddings.
+- Keyword-based retrieval using TF-IDF and scikit-learn.
+- Select one retrieval backend through the `RAG_BACKEND` configuration (`chroma` or `tfidf`).
+- Provide retrieved document context to the AI agent for document-based question answering.
 
-### 5. Analytics
-- Ticket overview and status summaries.
-- Ticket priority summaries.
-- High-priority open ticket retrieval.
-- Customer ticket summaries.
+**Note:** The current implementation selects one RAG backend at a time; it does not fuse ChromaDB and TF-IDF results into a single hybrid result set.
 
-### 6. Customer Import
-- Import customer records from supported files through the API.
+### 5. Document Management
+- Upload knowledge documents through the application.
+- Use document content as a knowledge source for AI-powered responses.
+- Integrate document processing with the RAG pipeline.
 
-### 7. Authentication and Administration
-- Authentication endpoints and JWT-based access configuration.
-- Role-based authorization for API operations.
-- User management endpoints.
+### 6. Authentication and Administration
+- User authentication.
+- JWT-based authentication configuration.
+- Administrative user management.
+- User role and account status management.
 
-## Agent Tools
+## System Architecture
 
-The LangChain agent is configured with tools in these areas:
-
-| Tool area | Capabilities |
-|---|---|
-| Customer CRM | Create, search, retrieve, update, and delete customers |
-| Tickets | Create, retrieve, and update tickets |
-| Customer import | Import customer data |
-| Knowledge base | Search internal documents through RAG |
-| Web search | Retrieve current external information |
-| Analytics | Retrieve ticket and customer-ticket summaries |
-
-The agent instructions distinguish internal company knowledge from current external information and direct requests to the appropriate tool.
-
-## Architecture
+The application follows a distributed frontend-backend architecture.
 
 ```text
-                 USER
-                  |
-                  v
-             STREAMLIT UI
-                  |
-              HTTP API
-                  |
-                  v
-              FASTAPI
-                  |
-            LANGCHAIN AGENT
-                  |
-       +----------+-----------+
-       |          |           |
-       v          v           v
-    CRM/Ticket  Knowledge   Analytics /
-      Tools     Base (RAG)  Web Search
-       |          |           |
-       v          v           v
-   PostgreSQL  RAG Backend  External Data
-                  |
-                  v
-              GROQ LLM
+                  USER
+                   |
+                   v
+              WEB BROWSER
+                   |
+                HTTPS
+                   |
+                   v
+             DUCKDNS DOMAIN
+                   |
+                   v
+              AWS EC2
+             UBUNTU 24.04
+                   |
+                   v
+                 NGINX
+                   |
+                   v
+           STREAMLIT FRONTEND
+             (Port 8501)
+                   |
+              HTTPS API
+                   |
+                   v
+            RENDER PLATFORM
+             FASTAPI BACKEND
+                   |
+          +--------+--------+
+          |        |        |
+          v        v        v
+       NEON DB   GROQ AI  OBJECT STORAGE
+     PostgreSQL   LLMs     Documents
 ```
+
+### Architecture Components
+
+| Component | Technology | Purpose |
+|---|---|---|
+| Frontend | Streamlit | Interactive CRM interface |
+| Backend | FastAPI | REST API and business logic |
+| Database | Neon PostgreSQL | Relational data storage |
+| LLM | Groq | AI-powered responses |
+| AI Framework | LangChain | LLM and retrieval integration |
+| RAG | Configurable ChromaDB or TF-IDF backend | Knowledge retrieval |
+| Embeddings | Hugging Face sentence-transformers (Chroma backend) | Semantic document embeddings |
+| Keyword Retrieval | scikit-learn TF-IDF | Keyword-based document retrieval |
+| Index Persistence | ChromaDB persistence / Joblib TF-IDF index | Store the selected retrieval index |
+| Object Storage | S3-compatible storage | Document storage |
+| Web Server | Nginx | Reverse proxy |
+| Frontend Hosting | AWS EC2 | Streamlit hosting |
+| Backend Hosting | Render | FastAPI hosting |
+| Domain | DuckDNS | Public application domain |
+| SSL | Let's Encrypt | HTTPS security |
 
 ## Technology Stack
 
-| Area | Technologies |
-|---|---|
-| Language | Python, SQL |
-| Frontend | Streamlit |
-| Backend | FastAPI |
-| Agent framework | LangChain |
-| LLM provider | Groq |
-| Retrieval | RAG knowledge-base search |
-| Database | PostgreSQL, SQLAlchemy |
-| External search | LangChain Tavily integration |
-| Document processing | PyPDF, DOCX/TXT loaders |
-| Authentication | JWT, pwdlib |
-| Storage integration | Boto3 / S3-compatible storage |
-| Testing | Pytest |
+**Programming Languages**
+- Python
+- SQL
 
-## Repository Structure
+**Frontend**
+- Streamlit
 
-The main branch has its own code and dependency set. Refer to the repository tree for the current exact layout. Core application areas include:
+**Backend**
+- FastAPI
+- REST APIs
 
-- `app/agent.py` — agent instructions and registered tools.
-- `app/api.py` — FastAPI application and API routes.
-- `app/tools/` — CRM, RAG, analytics, and web-search tools.
-- `app/services/` — business logic and supporting services.
-- `app/models.py` — database models.
-- `app/config.py` — environment-based configuration.
-- `main.py` — application entry point.
+**Artificial Intelligence**
+- Generative AI
+- Large Language Models
+- Retrieval-Augmented Generation
+- Configurable RAG (ChromaDB or TF-IDF)
+- Agentic AI
+- LangChain
+- Groq
+- Hugging Face Embeddings
 
-## Local Setup
+**Database and Storage**
+- PostgreSQL
+- Neon
+- ChromaDB
+- scikit-learn TF-IDF
+- S3-compatible Object Storage
 
-### 1. Clone the main branch
+**Cloud and Deployment**
+- AWS EC2
+- Render
+- Nginx
+- Ubuntu Linux
+- DuckDNS
+- Let's Encrypt
+- Certbot
+- Git and GitHub
+
+## Project Structure
+
+```text
+ai-powered-customer-support-agent/
+│
+├── app/
+│   ├── api/
+│   ├── services/
+│   ├── models/
+│   └── ...
+│
+├── app_ui.py
+├── main.py
+├── requirements.txt
+├── requirements-render.txt
+├── requirements-local.txt
+├── create_admin.py
+├── tests/
+├── .gitignore
+├── README.md
+└── DEPLOYMENT.md
+```
+
+*Note: The exact internal folders depend on the current repository version.*
+
+## Local Installation and Setup
+
+### 1. Clone the repository
 
 ```bash
-git clone -b main https://github.com/saravanadeep/ai-powered-customer-support-agent.git
+git clone -b feature/hybrid-rag \
+https://github.com/saravanadeep/ai-powered-customer-support-agent.git
+
 cd ai-powered-customer-support-agent
 ```
 
-### 2. Create and activate a virtual environment
+### 2. Create a virtual environment
+
+```bash
+python3 -m venv venv
+```
+
+### 3. Activate the environment
 
 macOS / Linux:
 
 ```bash
-python3 -m venv venv
 source venv/bin/activate
 ```
 
 Windows:
 
-```powershell
-python -m venv venv
-venv\\Scripts\\activate
+```bash
+venv\Scripts\activate
 ```
 
-### 3. Install dependencies
+### 4. Install dependencies
+
+Use the appropriate requirements file for your local development environment:
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements-local.txt
 ```
 
-### 4. Configure environment variables
+### 5. Configure environment variables
 
-Create a local `.env` file and provide the values required by `app/config.py` and the services you intend to use. These may include database, Groq, Tavily, authentication, and storage configuration.
+Create a `.env` file using the variable names required by the backend configuration.
 
-Never commit real credentials, API keys, database URLs, or private keys to GitHub.
+Configure the necessary database, authentication, AI provider, and storage credentials.
 
-### 5. Run the application
+**Never commit `.env` files or actual credentials to GitHub.**
 
-The FastAPI application is exposed as `app` from `main.py`:
+### 6. Start the application
+
+Start the FastAPI backend using the project's configured entry point:
 
 ```bash
 uvicorn main:app --reload
 ```
 
-Run the Streamlit UI in a separate terminal using the Streamlit entry-point file present on the main branch:
+Start the Streamlit frontend in a separate terminal:
 
 ```bash
-streamlit run streamlit.py
+streamlit run app_ui.py
 ```
 
-API documentation is available locally at:
+Refer to the backend configuration and `DEPLOYMENT.md` for environment-specific setup details.
 
-`http://127.0.0.1:8000/docs`
+## Deployment
 
-> Setup note: Verify required environment variables and any external services before starting the application. The main branch's requirements and entry-point filenames may differ from the deployment branch.
+The application is deployed using a distributed cloud architecture:
 
-## Branches
+- **AWS EC2:** Hosts the Streamlit frontend.
+- **Nginx:** Handles reverse proxy and HTTPS traffic.
+- **Render:** Hosts the FastAPI backend.
+- **Neon:** Provides PostgreSQL database services.
+- **DuckDNS:** Provides the public domain.
+- **Let's Encrypt:** Provides SSL certificates.
 
-This repository contains multiple development branches:
+### Frontend Deployment
 
-- **main** — the main development codebase. This README describes this branch.
-- **feature/hybrid-rag** — a separate branch containing the currently documented deployment setup and its own README and `DEPLOYMENT.md`.
+The frontend is deployed on AWS EC2 and managed through a systemd service.
 
-The feature branch README and deployment guide should be consulted for that branch's deployment-specific details. Do not assume its file names, dependencies, or deployment workflow apply to `main`.
+A deployment script is available:
+
+```bash
+~/deploy-frontend.sh
+```
+
+This script fetches the latest code from GitHub, performs a fast-forward-only update, restarts Streamlit, and checks the service status.
+
+### Backend Deployment
+
+The FastAPI backend is deployed separately on Render.
+
+Backend environment variables are configured through the Render dashboard.
+
+For complete deployment instructions, service management, HTTPS configuration, and recovery procedures, see:
+
+**[DEPLOYMENT.md](DEPLOYMENT.md)**
+
+## Application Screenshots
+
+Screenshots of the application can be added here to demonstrate:
+
+- CRM Dashboard
+- Customer Management
+- Ticket Management
+- AI Support Chat
+- Knowledge Document Upload
+- Administrative Dashboard
+
+## Future Improvements
+
+Potential areas for future development include:
+
+- Real-time customer support analytics.
+- Advanced ticket classification and prioritization.
+- Improved multi-agent workflows.
+- Voice-based AI customer support.
+- Automated customer sentiment analysis.
+- Enhanced monitoring and observability.
+
+## Deployment Verification
+
+The deployed application has been tested for:
+
+- Frontend and backend connectivity.
+- Customer and ticket management.
+- AI support chat.
+- Document upload.
+- Authentication and administrative functionality.
+- HTTPS access.
+- Automatic service startup.
+- EC2 reboot recovery.
+
+The Let's Encrypt staging renewal dry-run connection issue remains a maintenance item; the currently installed production certificate is valid.
 
 ## Author
 
 **K. R. Saravanadeep**
 
-B.Tech — Computer Science and Engineering
+B.Tech – Computer Science and Engineering
 
 **Areas of Interest**
 - Artificial Intelligence
@@ -204,7 +336,8 @@ B.Tech — Computer Science and Engineering
 - Agentic AI
 - Backend Development
 
-**Connect**
+**Connect with me**
+
 - GitHub: https://github.com/saravanadeep
 - LinkedIn: https://www.linkedin.com/in/k-r-saravanadeep-40249b306
 

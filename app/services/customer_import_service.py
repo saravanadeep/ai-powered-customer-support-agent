@@ -1,6 +1,6 @@
 from pathlib import Path
 
-import pandas as pd
+
 from sqlalchemy import func
 
 from app.database import SessionLocal
@@ -35,6 +35,7 @@ class CustomerImportService:
         path = Path(file_path)
 
         try:
+            import pandas as pd
 
             if path.suffix.lower() not in CustomerImportService.SUPPORTED_EXTENSIONS:
 
